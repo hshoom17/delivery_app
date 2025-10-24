@@ -17,15 +17,15 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] ?? json['_id'] ?? '',
+      id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
       email: json['email'] ?? '',
       name: json['name'],
       phone: json['phone'],
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt']) 
+      createdAt: json['created_at'] != null 
+          ? DateTime.tryParse(json['created_at'].toString()) 
           : null,
-      updatedAt: json['updatedAt'] != null 
-          ? DateTime.parse(json['updatedAt']) 
+      updatedAt: json['updated_at'] != null 
+          ? DateTime.tryParse(json['updated_at'].toString()) 
           : null,
     );
   }
@@ -115,10 +115,10 @@ class AuthResponse {
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
-      success: json['success'] ?? false,
-      message: json['message'],
+      success: json['success'] == true || json['success'] == 1,
+      message: json['message']?.toString(),
       user: json['user'] != null ? User.fromJson(json['user']) : null,
-      token: json['token'],
+      token: json['token']?.toString(),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
@@ -32,7 +33,8 @@ class AuthProvider extends ChangeNotifier {
       final token = prefs.getString(_tokenKey);
       
       if (userJson != null && token != null) {
-        _user = User.fromJson(userJson as Map<String, dynamic>);
+        final userData = json.decode(userJson) as Map<String, dynamic>;
+        _user = User.fromJson(userData);
         _token = token;
         notifyListeners();
       }
@@ -114,6 +116,11 @@ class AuthProvider extends ChangeNotifier {
     _setLoading(true);
     
     try {
+      // Call logout API if we have a token
+      if (_token != null) {
+        await _authService.logout(_token!);
+      }
+      
       // Clear stored data
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_userKey);
@@ -136,7 +143,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       if (_user != null) {
-        await prefs.setString(_userKey, _user!.toJson().toString());
+        await prefs.setString(_userKey, json.encode(_user!.toJson()));
       }
       if (_token != null) {
         await prefs.setString(_tokenKey, _token!);

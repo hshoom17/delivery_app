@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../utils/constants.dart';
 import '../widgets/custom_text_field.dart';
@@ -124,12 +125,33 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                               IconButton(
+                                onPressed: () async {
+                                  await Clipboard.setData(ClipboardData(text: authProvider.errorMessage!));
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Error message copied to clipboard'),
+                                        duration: Duration(seconds: 2),
+                                        backgroundColor: AppConstants.successGreen,
+                                      ),
+                                    );
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.copy,
+                                  color: AppConstants.errorRed,
+                                  size: 16,
+                                ),
+                                tooltip: 'Copy error message',
+                              ),
+                              IconButton(
                                 onPressed: () => authProvider.clearError(),
                                 icon: const Icon(
                                   Icons.close,
                                   color: AppConstants.errorRed,
                                   size: 16,
                                 ),
+                                tooltip: 'Dismiss error',
                               ),
                             ],
                           ),

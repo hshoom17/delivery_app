@@ -26,6 +26,7 @@ class AuthService {
       );
 
       final Map<String, dynamic> responseData = json.decode(response.body);
+      print('Login response data: $responseData');
 
       if (response.statusCode == 200) {
         return AuthResponse.fromJson(responseData);
@@ -36,9 +37,10 @@ class AuthService {
         );
       }
     } catch (e) {
+      print('Login network error details: $e');
       return AuthResponse(
         success: false,
-        message: 'Network error. Please check your connection.',
+        message: 'Network error. Please check your connection. Error: $e',
       );
     }
   }
@@ -65,6 +67,7 @@ class AuthService {
       );
 
       final Map<String, dynamic> responseData = json.decode(response.body);
+      print('Register response data: $responseData');
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         return AuthResponse.fromJson(responseData);
@@ -75,9 +78,10 @@ class AuthService {
         );
       }
     } catch (e) {
+      print('Register network error details: $e');
       return AuthResponse(
         success: false,
-        message: 'Network error. Please check your connection.',
+        message: 'Network error. Please check your connection. Error: $e',
       );
     }
   }
@@ -96,6 +100,64 @@ class AuthService {
       return 'Password must contain at least one letter and one number';
     }
     return null;
+  }
+
+  /// Logout user
+  Future<AuthResponse> logout(String token) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConstants.baseUrl}${AppConstants.logoutEndpoint}'),
+        headers: {
+          ..._headers,
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return AuthResponse.fromJson(responseData);
+      } else {
+        return AuthResponse(
+          success: false,
+          message: responseData['message'] ?? 'Logout failed. Please try again.',
+        );
+      }
+    } catch (e) {
+      return AuthResponse(
+        success: false,
+        message: 'Network error. Please check your connection.',
+      );
+    }
+  }
+
+  /// Get user profile
+  Future<AuthResponse> getUserProfile(String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConstants.baseUrl}${AppConstants.userEndpoint}'),
+        headers: {
+          ..._headers,
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return AuthResponse.fromJson(responseData);
+      } else {
+        return AuthResponse(
+          success: false,
+          message: responseData['message'] ?? 'Failed to get user profile.',
+        );
+      }
+    } catch (e) {
+      return AuthResponse(
+        success: false,
+        message: 'Network error. Please check your connection.',
+      );
+    }
   }
 
   /// Validate email format

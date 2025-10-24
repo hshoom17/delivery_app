@@ -2,9 +2,27 @@ import 'package:flutter/material.dart';
 
 class AppConstants {
   // API Configuration
-  static const String baseUrl = 'https://your-api-endpoint.com/api';
-  static const String loginEndpoint = '/auth/login';
-  static const String registerEndpoint = '/auth/register';
+  // Use 10.0.2.2 for Android emulator, localhost for iOS simulator
+  // For physical device, use your computer's IP address (e.g., 192.168.1.x)
+  static const String baseUrl = 'http://10.0.2.2:8000/api';
+  
+  // Auth Endpoints
+  static const String loginEndpoint = '/login';
+  static const String registerEndpoint = '/register';
+  static const String logoutEndpoint = '/logout';
+  static const String userEndpoint = '/user';
+  
+  // Restaurant Endpoints
+  static const String restaurantsEndpoint = '/restaurants';
+  
+  // Food Endpoints
+  static const String foodsEndpoint = '/foods';
+  
+  // Order Endpoints
+  static const String ordersEndpoint = '/orders';
+  
+  // Category Endpoints
+  static const String categoriesEndpoint = '/categories';
   
   // App Colors - Red-Orange Theme
   static const Color primaryGreen = Color(0xFFFF6B35); // Red-orange primary

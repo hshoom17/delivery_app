@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../utils/constants.dart';
 import '../widgets/custom_text_field.dart';
@@ -14,12 +15,14 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -34,6 +37,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final success = await authProvider.register(
       email: _emailController.text.trim(),
       password: _passwordController.text,
+      name: _nameController.text.trim(),
     );
 
     if (success && mounted) {
@@ -146,17 +150,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                               IconButton(
+                                onPressed: () async {
+                                  await Clipboard.setData(ClipboardData(text: authProvider.errorMessage!));
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Error message copied to clipboard'),
+                                        duration: Duration(seconds: 2),
+                                        backgroundColor: AppConstants.successGreen,
+                                      ),
+                                    );
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.copy,
+                                  color: AppConstants.errorRed,
+                                  size: 16,
+                                ),
+                                tooltip: 'Copy error message',
+                              ),
+                              IconButton(
                                 onPressed: () => authProvider.clearError(),
                                 icon: const Icon(
                                   Icons.close,
                                   color: AppConstants.errorRed,
                                   size: 16,
                                 ),
+                                tooltip: 'Dismiss error',
                               ),
                             ],
                           ),
                         ),
                   
+                      // Name Field
+                      CustomTextField(
+                        label: 'Full Name',
+                        hint: 'Enter your full name',
+                        icon: Icons.person_outline,
+                        controller: _nameController,
+                        keyboardType: TextInputType.name,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
                       // Email Field
                       CustomTextField(
                         label: 'Email Address',
