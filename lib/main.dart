@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
+import 'screens/home_screen.dart';
 import 'providers/auth_provider.dart';
+import 'providers/menu_provider.dart';
+import 'providers/cart_provider.dart';
 import 'utils/constants.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ChangeNotifierProvider(create: (context) => MenuProvider()),
+        ChangeNotifierProvider(create: (context) => CartProvider()),
+      ],
       child: const DeliveryApp(),
     ),
   );
@@ -113,9 +120,8 @@ class _AuthWrapperState extends State<AuthWrapper> {
           return const LoginScreen();
         }
         
-        // TODO: Navigate to home screen when authenticated
-        // For now, show login screen
-        return const LoginScreen();
+        // Navigate to home screen when authenticated
+        return const HomeScreen();
       },
     );
   }
