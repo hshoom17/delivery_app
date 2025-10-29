@@ -23,9 +23,23 @@ class MenuProvider extends ChangeNotifier {
     try {
       final items = await _menuService.getMenuItems();
       _menuItems = items;
+      if (items.isEmpty) {
+        _setError('No menu items available. Please check if the database has been seeded.');
+      } else {
+        _clearError(); // Clear any previous errors on success
+      }
       notifyListeners();
     } catch (e) {
-      _setError('Failed to load menu items: $e');
+      // MenuService now throws detailed exceptions, so display them directly
+      String errorMessage;
+      if (e is Exception) {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+      } else {
+        errorMessage = 'Failed to load menu items: $e';
+      }
+      _setError(errorMessage);
+      print('[MenuProvider] Error loading menu items: $errorMessage');
+      notifyListeners();
     } finally {
       _setLoading(false);
     }

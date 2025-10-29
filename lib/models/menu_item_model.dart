@@ -16,13 +16,35 @@ class MenuItem {
   });
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
+    // Handle price conversion - Laravel returns decimal as string or number
+    double parsePrice(dynamic priceValue) {
+      if (priceValue == null) return 0.0;
+      if (priceValue is double) return priceValue;
+      if (priceValue is int) return priceValue.toDouble();
+      if (priceValue is String) {
+        return double.tryParse(priceValue) ?? 0.0;
+      }
+      return 0.0;
+    }
+
+    // Handle available boolean
+    bool parseAvailable(dynamic availableValue) {
+      if (availableValue == null) return true;
+      if (availableValue is bool) return availableValue;
+      if (availableValue is int) return availableValue != 0;
+      if (availableValue is String) {
+        return availableValue.toLowerCase() == 'true' || availableValue == '1';
+      }
+      return true;
+    }
+
     return MenuItem(
-      id: json['id'] ?? json['food_id'] ?? 0,
-      name: json['name'] ?? json['food_name'] ?? '',
-      description: json['description'] ?? '',
-      price: (json['price'] ?? 0.0).toDouble(),
-      imageUrl: json['image_url'] ?? json['image'],
-      available: json['available'] ?? true,
+      id: (json['id'] ?? json['food_id'] ?? 0) as int,
+      name: (json['name'] ?? json['food_name'] ?? '').toString(),
+      description: (json['description'] ?? '').toString(),
+      price: parsePrice(json['price']),
+      imageUrl: json['image_url']?.toString() ?? json['image']?.toString(),
+      available: parseAvailable(json['available']),
     );
   }
 

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/menu_provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/auth_provider.dart';
-import '../widgets/menu_item_card.dart';
+import '../widgets/menu_item_row.dart';
 import '../widgets/cart_item_row.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/custom_text_field.dart';
@@ -102,30 +102,70 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           if (menuProvider.errorMessage != null) {
+            final isNetworkError = menuProvider.errorMessage!.toLowerCase().contains('network') ||
+                                   menuProvider.errorMessage!.toLowerCase().contains('connection') ||
+                                   menuProvider.errorMessage!.toLowerCase().contains('unable to reach');
+            
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: AppConstants.errorRed,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    menuProvider.errorMessage!,
-                    style: const TextStyle(
-                      fontSize: 16,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppConstants.defaultPadding),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
                       color: AppConstants.errorRed,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => menuProvider.loadMenuItems(),
-                    child: const Text('Retry'),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    Text(
+                      menuProvider.errorMessage!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: AppConstants.errorRed,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    if (isNetworkError) ...[
+                      const SizedBox(height: 24),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppConstants.lightGray,
+                          borderRadius: BorderRadius.circular(AppConstants.defaultRadius),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Troubleshooting Tips:',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.darkGray,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildTroubleshootItem('1. Ensure Laravel server is running'),
+                            _buildTroubleshootItem('2. Check API URL in constants.dart'),
+                            _buildTroubleshootItem('3. For emulator: Use 10.0.2.2:8000'),
+                            _buildTroubleshootItem('4. For physical device: Use your PC IP'),
+                            _buildTroubleshootItem('5. Verify CORS is configured'),
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => menuProvider.loadMenuItems(),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           }
@@ -138,20 +178,13 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(AppConstants.defaultPadding),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.8,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-            ),
+          return ListView.builder(
             itemCount: menuProvider.availableItems.length,
             itemBuilder: (context, index) {
               final menuItem = menuProvider.availableItems[index];
               return Consumer<CartProvider>(
                 builder: (context, cartProvider, child) {
-                  return MenuItemCard(
+                  return MenuItemRow(
                     menuItem: menuItem,
                     quantityInCart: cartProvider.getItemQuantity(menuItem),
                     onAddToCart: () => cartProvider.addItem(menuItem),
@@ -197,6 +230,34 @@ class _HomeScreenState extends State<HomeScreen> {
             label: Text('${cartProvider.itemCount}'),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildTroubleshootItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '•',
+            style: TextStyle(
+              fontSize: 16,
+              color: AppConstants.textGray,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppConstants.textGray,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

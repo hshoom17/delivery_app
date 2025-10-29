@@ -2,8 +2,26 @@ import 'package:flutter/material.dart';
 
 class AppConstants {
   // API Configuration
-  // Use 10.0.2.2 for Android emulator, localhost for iOS simulator
-  // For physical device, use your computer's IP address (e.g., 192.168.1.x)
+  // 
+  // IMPORTANT: Configure the baseUrl based on your testing environment:
+  //
+  // 1. Android Emulator: Use 'http://10.0.2.2:8000/api'
+  //    - 10.0.2.2 is a special alias that points to localhost on your host machine
+  //
+  // 2. iOS Simulator: Use 'http://localhost:8000/api' or 'http://127.0.0.1:8000/api'
+  //
+  // 3. Physical Device (Android/iOS): Use your computer's IP address
+  //    - Find your IP: Windows (ipconfig), Mac/Linux (ifconfig)
+  //    - Format: 'http://192.168.1.X:8000/api' (replace X with your IP)
+  //    - Ensure your phone and computer are on the same WiFi network
+  //    - Ensure your firewall allows connections on port 8000
+  //
+  // 4. Laravel Server Setup:
+  //    - Make sure Laravel is running: php artisan serve
+  //    - Default Laravel port is 8000
+  //    - Verify CORS is configured in config/cors.php
+  //    - Test the API endpoint: http://[your-base-url]/api/foods
+  //
   static const String baseUrl = 'http://10.0.2.2:8000/api';
   
   // Auth Endpoints
